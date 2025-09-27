@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Most Terrible Form Ever</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(45deg, #ff0080, #8000ff, #00ff80, #ff8000);
+            background-size: 400% 400%;
+            animation: backgroundShift 3s ease-in-out infinite;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        @keyframes backgroundShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .page {
+            display: none;
+            text-align: center;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+        
+        .typing-challenge {
+            background: rgba(0, 0, 0, 0.7);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .target-text {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .typing-input {
+            width: 100%;
+            background: transparent;
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .typing-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        .progress {
+            text-align: left;
+            font-size: 0.9em;
+            color: #ffff00;
+        }
+        
+        .correct { color: #00ff00; }
+        .incorrect { color: #ff0000; background: rgba(255, 0, 0, 0.2); }
+        .current { background: rgba(255, 255, 0, 0.3); }
+        
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            border: 3px solid #ff0080;
+            border-radius: 25px;
+            font-size: 1.2em;
+            background: rgba(255, 255, 255, 0.9);
+            transform: rotate(-2deg);
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            transform: rotate(2deg) scale(1.05);
+            outline: none;
+            box-shadow: 0 0 20px #ff0080;
+        }
+        
+        .form-input:nth-child(even) {
+            transform: rotate(2deg);
+        }
+        
+        .form-input:nth-child(even):focus {
+            transform: rotate(-2deg) scale(1.05);
+        }
+        
+        label {
+            display: block;
+            color: #fff;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            transform: rotate(5deg);
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            align-items: center;
+        }
+        
+        .next-btn {
+            background: #8000ff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            order: -1;
+            box-shadow: 0 4px 15px rgba(128, 0, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(128, 0, 255, 0.6);
+        }
+        
+        .next-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .back-btn {
+            background: #00ff80;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 255, 128, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 128, 0.6);
+        }
+        
+        .horror-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            z-index: 1000;
+            animation: scareEntry 0.5s ease-out;
+        }
+        
+        @keyframes scareEntry {
+            0% { opacity: 0; transform: scale(0.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .horror-popup.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .horror-content {
+            position: relative;
+            text-align: center;
+        }
+        
+        .horror-image {
+            max-width: 80vw;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 0 50px #ff0000;
+        }
+        
+        .horror-close {
+            position: absolute;
+            bottom: -60px;
+            right: -20px;
+            background: #666;
+            color: #999;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .horror-close:hover {
+            background: #777;
+            color: #aaa;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Landing Page -->
+        <div class="page active" id="landing">
+            <h1>🎃 Welcome to Hell's Form 🎃</h1>
+            <p style="color: white; font-size: 1.3em; margin-bottom: 20px;">
+                Before you can proceed, you must prove your worth by typing the following text EXACTLY:
+            </p>
+            
+            <div class="typing-challenge">
+                <div class="target-text" id="targetText">
+                    The quick brown fox jumps over the lazy dog while navigating through this terrifyingly designed form that will haunt your dreams forever and make you question all your life choices.
+                </div>
+                <input type="text" class="typing-input" id="typingInput" placeholder="Start typing here..." autocomplete="off">
+                <div class="progress" id="progress">Progress: 0%</div>
+            </div>
+            
+            <div class="button-container">
+                <button class="next-btn" id="startBtn" disabled>Enter the Nightmare →</button>
+            </div>
+        </div>
+        
+        <!-- Form Pages -->
+        <div class="page" id="page1">
+            <h1>👻 Step 1 of ∞</h1>
+            <label for="name">What is your name? (whisper it to the void)</label>
+            <input type="text" class="form-input" id="name" placeholder="Your mortal name...">
+            
+            <div class="button-container">
+                <button class="next-btn">Proceed to Doom →</button>
+                <button class="back-btn">Retreat to Safety</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page2">
+            <h1>🕷️ Step 2 of ∞</h1>
+            <label for="email">Your electronic soul address</label>
+            <input type="email" class="form-input" id="email" placeholder="soul@darkness.void">
+            
+            <div class="button-container">
+                <button class="next-btn">Deeper Into Madness →</button>
+                <button class="back-btn">Flee in Terror</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page3">
+            <h1>🦇 Step 3 of ∞</h1>
+            <label for="phone">The digits of your communication device</label>
+            <input type="tel" class="form-input" id="phone" placeholder="666-HELL-666">
+            
+            <div class="button-container">
+                <button class="next-btn">Continue the Torment →</button>
+                <button class="back-btn">Escape the Nightmare</button>
+            </div>
+        </div>
+        
+        <div class="page" id="page4">
+            <h1>🎭 Final Destination</h1>
+            <label for="message">Leave your final words</label>
+            <textarea class="form-input" id="message" rows="4" placeholder="The form has consumed my soul..."></textarea>
+            
+            <div class="button-container">
+                <button class="next-btn" onclick="submitForm()">Submit to Eternal Damnation →</button>
+                <button class="back-btn">One Last Chance to Escape</button>
+            </div>
+        </div>
+        
+        <div class="page" id="success">
+            <h1>🔥 CONGRATULATIONS! 🔥</h1>
+            <p style="color: white; font-size: 1.5em; margin: 20px 0;">
+                You have successfully completed the most terrible form in existence!
+            </p>
+            <p style="color: #ffff00; font-size: 1.2em;">
+                Your data has been sent to the void... probably.
+            </p>
+            <button class="next-btn" onclick="location.reload()">Start Over (Glutton for Punishment)</button>
+        </div>
+    </div>
+    
+    <!-- Horror Popup -->
+    <div class="horror-popup" id="horrorPopup">
+        <div class="horror-content">
+            <img class="horror-image" id="horrorImage" src="" alt="Horror Image">
+            <button class="horror-close" onclick="closeHorror()">×</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentPage = 0;
+        let pages = ['landing', 'page1', 'page2', 'page3', 'page4'];
+        let horrorTimer;
+        let formStartTime;
+        
+        const targetText = "The quick brown fox jumps over the lazy dog while navigating through this terrifyingly designed form that will haunt your dreams forever and make you question all your life choices.";
+        const typingInput = document.getElementById('typingInput');
+        const progress = document.getElementById('progress');
+        const startBtn = document.getElementById('startBtn');
+        
+        // Horror images (placeholder URLs - replace with actual horror images)
+        const horrorImages = [
+            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="%23000"/><text x="200" y="200" text-anchor="middle" fill="%23ff0000" font-size="60" font-family="serif">BOO!</text><text x="200" y="260" text-anchor="middle" fill="%23ff0000" font-size="20" font-family="serif">You have been scared!</text></svg>',
+            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="%23330000"/><text x="200" y="180" text-anchor="middle" fill="%23ff6666" font-size="40" font-family="serif">👻 GHOST 👻</text><text x="200" y="240" text-anchor="middle" fill="%23ff6666" font-size="16" font-family="serif">I am haunting your form!</text></svg>',
+            'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="%23001100"/><text x="200" y="200" text-anchor="middle" fill="%2300ff00" font-size="50" font-family="monospace">ERROR 404</text><text x="200" y="250" text-anchor="middle" fill="%2300ff00" font-size="16" font-family="monospace">Sanity not found</text></svg>'
+        ];
+        
+        // Typing challenge logic
+        typingInput.addEventListener('input', function() {
+            const typed = this.value;
+            const progressPercent = Math.round((typed.length / targetText.length) * 100);
+            progress.textContent = `Progress: ${Math.min(progressPercent, 100)}%`;
+            
+            let displayText = '';
+            for (let i = 0; i < targetText.length; i++) {
+                if (i < typed.length) {
+                    if (typed[i] === targetText[i]) {
+                        displayText += `<span class="correct">${targetText[i]}</span>`;
+                    } else {
+                        displayText += `<span class="incorrect">${targetText[i]}</span>`;
+                    }
+                } else if (i === typed.length) {
+                    displayText += `<span class="current">${targetText[i]}</span>`;
+                } else {
+                    displayText += targetText[i];
+                }
+            }
+            
+            document.getElementById('targetText').innerHTML = displayText;
+            
+            if (typed === targetText) {
+                startBtn.disabled = false;
+                startBtn.textContent = "🎉 Enter the Nightmare → 🎉";
+            } else {
+                startBtn.disabled = true;
+                startBtn.textContent = "Enter the Nightmare →";
+            }
+        });
+        
+        // Page navigation
+        function showPage(pageIndex) {
+            pages.forEach(page => {
+                document.getElementById(page).classList.remove('active');
+            });
+            
+            if (pageIndex < pages.length) {
+                document.getElementById(pages[pageIndex]).classList.add('active');
+                currentPage = pageIndex;
+                
+                // Start horror timer when form begins
+                if (pageIndex === 1 && !formStartTime) {
+                    formStartTime = Date.now();
+                    startHorrorTimer();
+                }
+            }
+        }
+        
+        // Horror popup system
+        function startHorrorTimer() {
+            horrorTimer = setInterval(showHorror, 60000); // Every 60 seconds
+        }
+        
+        function showHorror() {
+            const randomImage = horrorImages[Math.floor(Math.random() * horrorImages.length)];
+            document.getElementById('horrorImage').src = randomImage;
+            document.getElementById('horrorPopup').classList.add('show');
+            
+            // Auto-close after 5 seconds if user doesn't close it
+            setTimeout(() => {
+                closeHorror();
+            }, 5000);
+        }
+        
+        function closeHorror() {
+            document.getElementById('horrorPopup').classList.remove('show');
+        }
+        
+        // Button event listeners
+        document.getElementById('startBtn').addEventListener('click', () => {
+            showPage(1);
+        });
+        
+        // Add event listeners to all next and back buttons
+        document.querySelectorAll('.next-btn').forEach((btn, index) => {
+            if (btn.id !== 'startBtn') {
+                btn.addEventListener('click', () => {
+                    if (currentPage < pages.length - 1) {
+                        showPage(currentPage + 1);
+                    }
+                });
+            }
+        });
+        
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (currentPage > 0) {
+                    showPage(currentPage - 1);
+                }
+            });
+        });
+        
+        function submitForm() {
+            clearInterval(horrorTimer);
+            showPage(pages.length); // Show success page
+            document.getElementById('success').classList.add('active');
+        }
+        
+        // Add some random cursor effects for extra annoyance
+        let cursorTrail = [];
+        document.addEventListener('mousemove', (e) => {
+            cursorTrail.push({x: e.clientX, y: e.clientY, time: Date.now()});
+            if (cursorTrail.length > 10) cursorTrail.shift();
+        });
+        
+        // Clean up old cursor trail points
+        setInterval(() => {
+            const now = Date.now();
+            cursorTrail = cursorTrail.filter(point => now - point.time < 1000);
+        }, 100);
+    </script>
+</body>
+</html>
